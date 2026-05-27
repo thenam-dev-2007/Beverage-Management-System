@@ -187,14 +187,12 @@ class BeverageManagementSystem(tk.Tk):
         settings_win.geometry("1000x600")
         settings_win.grab_set() 
 
-        # Khung chứa Phân Loại (Nửa bên trái)
         frame_loai = tk.LabelFrame(settings_win, text="Quản lý Phân Loại", font=("Arial", 11, "bold"), fg="#2C3E50")
         frame_loai.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(20, 10), pady=20)
         
         self.setup_standard_tab("Phân Loại", "AUTO", "PhanLoai", "IdLoai",
             ("STT", "Tên Phân Loại"), ["Tên Phân Loại"], ["TenLoai"], parent_frame=frame_loai)
 
-        # Khung chứa Chức Vụ (Nửa bên phải)
         frame_cv = tk.LabelFrame(settings_win, text="Quản lý Chức Vụ", font=("Arial", 11, "bold"), fg="#2C3E50")
         frame_cv.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True, padx=(10, 20), pady=20)
         
@@ -204,9 +202,7 @@ class BeverageManagementSystem(tk.Tk):
     # ==========================================
     # 3. CÁC HÀM XÂY DỰNG UI TÁI SỬ DỤNG
     # ==========================================
-    # SỬA LỖI: Bổ sung tham số mặc định parent_frame=None để nhận dữ liệu từ pop-up thiết lập
     def setup_standard_tab(self, tab_title, id_prefix, table_name, id_col, cols, fields, db_cols, custom_query=None, parent_frame=None):
-        # Nếu có truyền parent_frame (giao diện pop-up) thì dùng nó, ngược lại thì thêm vào notebook chính
         parent = parent_frame if parent_frame else self.notebook
         tab = tk.Frame(parent, bg=self.tab_bg)
         
@@ -229,11 +225,10 @@ class BeverageManagementSystem(tk.Tk):
         tab = tk.Frame(self.notebook, bg=self.tab_bg)
         self.notebook.add(tab, text=tab_title)
         
-        # Cải tiến: Tạo tree trước nút bấm để tránh lỗi cảnh báo tham chiếu (Late-binding warning)
         tree = self.create_treeview(tab, cols)
         
         btn_frame = tk.Frame(tab, bg=self.tab_bg)
-        btn_frame.pack(fill='x', pady=10, before=tree.master) # Đảm bảo nút nằm phía trên bảng dữ liệu
+        btn_frame.pack(fill='x', pady=10, before=tree.master) 
         
         inner_frame = tk.Frame(btn_frame, bg=self.tab_bg)
         inner_frame.pack(anchor='center')
@@ -466,7 +461,7 @@ class BeverageManagementSystem(tk.Tk):
                     tree.delete(item)
 
     # ==========================================
-    # 5. NGHIỆP VỤ PHIẾU NHẬP / HÓA ĐƠN
+    # 5. PHIẾU NHẬP / HÓA ĐƠN
     # ==========================================
     def open_import_window(self, view_data=None):
         win = tk.Toplevel(self)
@@ -474,11 +469,10 @@ class BeverageManagementSystem(tk.Tk):
         win.geometry("850x650")
         win.grab_set()
 
-        # Biến quản lý tổng tiền realtime
+        # Biến quản lý tổng tiền 
         total_var = tk.StringVar(value="0 VNĐ")
         is_view_mode = view_data is not None
         
-        # BỔ SUNG: Khởi tạo biến lưu trạng thái hiện tại
         current_status = ""
 
         # --- PHẦN 1 & 2: THÔNG TIN CHUNG ---
@@ -501,14 +495,13 @@ class BeverageManagementSystem(tk.Tk):
         ent_ngay = tk.Entry(info_frame, width=15)
         ent_ngay.grid(row=1, column=3, padx=5, pady=5)
 
-        # THAY ĐỔI: Thêm nhãn Trạng thái cho cả 2 chế độ
         tk.Label(info_frame, text="Trạng thái:").grid(row=2, column=0, padx=5, pady=5, sticky='w')
 
         if not is_view_mode:
             now = datetime.now()
             ent_ngay.insert(0, now.strftime("%Y-%m-%d %H:%M:%S"))
             
-            # Tạo mã tự động (giữ nguyên logic của bạn)
+            # Tạo mã tự động 
             last_pnh = self.db.fetch_all("SELECT MaPNH FROM PhieuNhapHang ORDER BY IdPN DESC LIMIT 1")
             if last_pnh and last_pnh[0][0]:
                 match = re.search(r'\d+', last_pnh[0][0])
@@ -518,7 +511,6 @@ class BeverageManagementSystem(tk.Tk):
                 else: ent_ma_pnh.insert(0, "PN001")
             else: ent_ma_pnh.insert(0, "PN001")
             
-            # THAY ĐỔI: Thêm Combobox để chọn trạng thái khi TẠO MỚI
             cbo_status = ttk.Combobox(info_frame, values=["Chưa Thanh Toán", "Đã Thanh Toán"], width=15, state="readonly")
             cbo_status.set("Chưa Thanh Toán") # Mặc định ban đầu
             cbo_status.grid(row=2, column=1, padx=5, pady=5, sticky='w')
@@ -643,7 +635,7 @@ class BeverageManagementSystem(tk.Tk):
         tk.Label(bottom_frame, text="TỔNG GIÁ TRỊ PHIẾU:", font=('Arial', 12, 'bold')).pack(side='left')
         tk.Label(bottom_frame, textvariable=total_var, font=('Arial', 14, 'bold'), fg='red').pack(side='left', padx=10)
 
-        # Xử lý TRANSACTION lưu dữ liệu an toàn tuyệt đối vào MySQL (Cho Thêm Mới)
+        # Xử lý TRANSACTION lưu dữ liệu an toàn vào MySQL (Cho Thêm Mới)
         def save_import_to_db():
             ma_pnh = ent_ma_pnh.get().strip()
             ma_ncc = ent_ma_ncc.get().strip()
@@ -672,7 +664,6 @@ class BeverageManagementSystem(tk.Tk):
             try:
                 self.db.execute_query("START TRANSACTION")
                 
-                # THAY ĐỔI: Truyền biến `trang_thai` từ combobox vào câu lệnh INSERT
                 sql_pnh = "INSERT INTO PhieuNhapHang (MaPNH, TongGiaTri, NgayNhap, TrangThai, IdNCC, IdNV) VALUES (%s, %s, %s, %s, %s, %s)"
                 self.db.execute_query(sql_pnh, (ma_pnh, tong_tien, ngay_nhap, trang_thai, id_ncc, id_nv))
                 
@@ -701,7 +692,7 @@ class BeverageManagementSystem(tk.Tk):
                 self.db.execute_query("ROLLBACK")
                 messagebox.showerror("Lỗi", f"Giao dịch hủy bỏ: {e}")
 
-        # --- PHẦN ĐUÔI FORM (Hiển thị nút bấm duyệt hóa đơn cũ nếu cần) ---
+        # --- PHẦN ĐUÔI FORM  ---
         if not is_view_mode:
             tk.Button(bottom_frame, text="📥 LƯU PHIẾU NHẬP", font=('Arial', 11, 'bold'), bg='#007BFF', fg='white', width=22, command=save_import_to_db).pack(side='right')
         else:
@@ -747,14 +738,14 @@ class BeverageManagementSystem(tk.Tk):
         ent_ngay = tk.Entry(info_frame, width=15)
         ent_ngay.grid(row=1, column=3, padx=5, pady=5)
 
-        # THAY ĐỔI: Thêm nhãn Trạng thái cho hóa đơn
+        # Thêm nhãn Trạng thái cho hóa đơn
         tk.Label(info_frame, text="Trạng thái:").grid(row=2, column=0, padx=5, pady=5, sticky='w')
 
         if not is_view_mode:
             now = datetime.now()
             ent_ngay.insert(0, now.strftime("%Y-%m-%d %H:%M:%S"))
             
-            # Tạo mã tự động (giữ nguyên logic của bạn)
+            # Tạo mã tự động 
             last_hd = self.db.fetch_all("SELECT MaHD FROM HoaDon ORDER BY IdHD DESC LIMIT 1")
             if last_hd and last_hd[0][0]:
                 match = re.search(r'\d+', last_hd[0][0])
@@ -764,7 +755,7 @@ class BeverageManagementSystem(tk.Tk):
                 else: ent_ma_hd.insert(0, "HD001")
             else: ent_ma_hd.insert(0, "HD001")
             
-            # THAY ĐỔI: Thêm Combobox để chọn trạng thái khi TẠO MỚI HÓA ĐƠN
+            # Thêm Combobox để chọn trạng thái khi TẠO MỚI HÓA ĐƠN
             cbo_status = ttk.Combobox(info_frame, values=["Chưa Thanh Toán", "Đã Thanh Toán"], width=15, state="readonly")
             cbo_status.set("Chưa Thanh Toán") # Hoặc đổi thành "Đã Thanh Toán" tùy ý bạn muốn mặc định trước
             cbo_status.grid(row=2, column=1, padx=5, pady=5, sticky='w')
@@ -804,7 +795,6 @@ class BeverageManagementSystem(tk.Tk):
             ent_item_gia = tk.Entry(add_item_frame, width=12)
             ent_item_gia.grid(row=0, column=5, padx=5, pady=5)
 
-            # Sự kiện tự động điền đơn giá niêm yết khi gõ mã SP giúp tăng trải nghiệm UX
             def auto_fetch_price(event):
                 sp_code = ent_item_sp.get().strip()
                 if sp_code:
@@ -900,7 +890,7 @@ class BeverageManagementSystem(tk.Tk):
             ma_nv = ent_ma_nv.get().strip()
             ngay_lap = ent_ngay.get().strip()
             
-            # THAY ĐỔI: Lấy trạng thái do người dùng chọn từ Combobox
+            # Lấy trạng thái do người dùng chọn từ Combobox
             trang_thai = cbo_status.get() 
             
             items = tree_detail.get_children()
@@ -921,7 +911,6 @@ class BeverageManagementSystem(tk.Tk):
             try:
                 self.db.execute_query("START TRANSACTION")
                 
-                # THAY ĐỔI: Gán biến `trang_thai` từ combobox vào câu lệnh INSERT thay vì gán cứng
                 sql_hd = "INSERT INTO HoaDon (MaHD, TongGiaTri, NgayLap, TrangThai, IdKH, IdNV) VALUES (%s, %s, %s, %s, %s, %s)"
                 self.db.execute_query(sql_hd, (ma_hd, tong_tien, ngay_lap, trang_thai, id_kh, id_nv))
                 
