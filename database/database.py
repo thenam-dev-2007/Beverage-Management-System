@@ -1,15 +1,12 @@
 import mysql.connector
 from mysql.connector import Error
-
 class DatabaseManager:
     def __init__(self):
         self.host = 'localhost'
-        self.database = 'quanlycuahang' # Tên database bạn vừa tạo
-        self.user = 'root'                 # Tên đăng nhập 
-        self.password = 'admin'                 # Mật khẩu 
-
+        self.database = 'quanlycuahang' 
+        self.user = 'root'                 
+        self.password = 'admin'               
     def connect(self):
-        """Tạo kết nối đến MySQL"""
         try:
             connection = mysql.connector.connect(
                 host=self.host,
@@ -21,7 +18,6 @@ class DatabaseManager:
         except Error as e:
             print(f"Lỗi kết nối MySQL: {e}")
             return None
-
     def fetch_all(self, query, params=None):
         """Dùng để chạy lệnh SELECT lấy dữ liệu"""
         conn = self.connect()
@@ -37,7 +33,6 @@ class DatabaseManager:
             finally:
                 cursor.close()
                 conn.close()
-
     def execute_query(self, query, params=None):
         """Dùng để chạy lệnh INSERT, UPDATE, DELETE"""
         conn = self.connect()
@@ -53,7 +48,6 @@ class DatabaseManager:
             finally:
                 cursor.close()
                 conn.close()
-                
     def fetch_one(self, query, params=None):
         try:
             self.cursor.execute(query, params or ())
