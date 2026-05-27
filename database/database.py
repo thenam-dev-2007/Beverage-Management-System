@@ -53,3 +53,11 @@ class DatabaseManager:
             finally:
                 cursor.close()
                 conn.close()
+                
+    def fetch_one(self, query, params=None):
+        try:
+            self.cursor.execute(query, params or ())
+            return self.cursor.fetchone()
+        except Exception as e:
+            print("Lỗi fetch_one:", e)
+            return None
