@@ -502,7 +502,7 @@ class BeverageManagementSystem(tk.Tk):
             ent_ngay.insert(0, now.strftime("%Y-%m-%d %H:%M:%S"))
             
             # Tạo mã tự động 
-            last_pnh = self.db.fetch_all("SELECT MaPNH FROM PhieuNhapHang ORDER BY IdPN DESC LIMIT 1")
+            last_pnh = self.db.fetch_all("SELECT MaPNH FROM PhieuNhapHang ORDER BY IdPNH DESC LIMIT 1")
             if last_pnh and last_pnh[0][0]:
                 match = re.search(r'\d+', last_pnh[0][0])
                 if match:
@@ -667,7 +667,7 @@ class BeverageManagementSystem(tk.Tk):
                 sql_pnh = "INSERT INTO PhieuNhapHang (MaPNH, TongGiaTri, NgayNhap, TrangThai, IdNCC, IdNV) VALUES (%s, %s, %s, %s, %s, %s)"
                 self.db.execute_query(sql_pnh, (ma_pnh, tong_tien, ngay_nhap, trang_thai, id_ncc, id_nv))
                 
-                res_id_pnh = self.db.fetch_all(f"SELECT IdPN FROM PhieuNhapHang WHERE MaPNH='{ma_pnh}'")
+                res_id_pnh = self.db.fetch_all(f"SELECT IdPNH FROM PhieuNhapHang WHERE MaPNH='{ma_pnh}'")
                 id_pnh = res_id_pnh[0][0]
 
                 for item in items:
